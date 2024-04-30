@@ -7,7 +7,15 @@ import { FiUploadCloud } from 'react-icons/fi';
 import { Action } from '@/types/types';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import loadFfmpeg from '@/utils/loadFfmpeg';
-import convertFile from "@/utils/convert";
+import convertFile from '@/utils/convert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface DropzoneProps {}
 
