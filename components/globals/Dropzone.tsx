@@ -18,10 +18,16 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { extensions } from '@/utils/extensions';
 import fileToIcon from '@/utils/fileToIcon';
 import compressFileName from '@/utils/compressFileName';
 import bytesToSize from '@/utils/bytesToSize';
+import { BiError } from 'react-icons/bi';
+import { MdClose, MdDone } from 'react-icons/md';
+import { ImSpinner3 } from 'react-icons/im';
+import { HiOutlineDownload } from 'react-icons/hi';
+import { acceptedFiles } from '@/utils/acceptedFiles';
 
 interface DropzoneProps {}
 
@@ -38,24 +44,6 @@ const Dropzone: FC<DropzoneProps> = ({}) => {
   const [defaultValues, setDefaultValues] = useState<string>('video');
 
   const ffmpegRef = useRef<any>(null);
-
-  const acceptedFiles = {
-    'image/*': [
-      '.jpg',
-      '.jpeg',
-      '.png',
-      '.gif',
-      '.bmp',
-      '.webp',
-      '.ico',
-      '.tif',
-      '.tiff',
-      '.raw',
-      '.tga',
-    ],
-    'audio/*': [],
-    'video/*': [],
-  };
 
   const handleUpload = (data: Array<any>): void => {
     handleExitHover();
@@ -161,6 +149,27 @@ const Dropzone: FC<DropzoneProps> = ({}) => {
     setIsConverting(false);
   };
 
+  const updateAction = (file_name: String, to: String) => {
+    setActions(
+      actions.map((action): Action => {
+        if (action.file_name === file_name) {
+          console.log('FOUND');
+          return {
+            ...action,
+            to,
+          };
+        }
+
+        return action;
+      })
+    );
+  };
+
+  const deleteAction = (action: Action): void => {
+    setActions(actions.filter((elt) => elt !== action));
+    setFiles(files.filter((elt) => elt.name !== action.file_name));
+  };
+
   const handleHover = (): void => setIsHover(true);
   const handleExitHover = (): void => setIsHover(false);
 
@@ -178,6 +187,183 @@ const Dropzone: FC<DropzoneProps> = ({}) => {
   useEffect(() => {
     load();
   }, []);
+
+  if (actions.length) {
+    return (
+      <div className="space-y-6">
+        {actions.map((action: Action, i: any) => (
+          <div
+            key={i}
+            className="w-full py-4 space-y-2 lg:py-0 relative cursor-pointer rounded-xl border h-fit lg:h-20 px-4 lg:px-10 flex flex-wrap lg:flex-nowrap items-center justify-between"
+          >
+            {!is_loaded && (
+              <Skeleton className="h-full w-full -ml-10 cursor-progress absolute rounded-xl" />
+            )}
+            <div className="flex gap-4 items-center">
+              <span className="text-2xl text-orange-600">
+                {fileToIcon(action.file_type)}
+              </span>
+              <div className="flex items-center gap-1 w-96">
+                <span className="text-md font-medium overflow-x-hidden">
+                  {compressFileName(action.file_name)}
+                </span>
+                <span className="text-muted-foreground text-sm">
+                  ({bytesToSize(action.file_size)})
+                </span>
+              </div>
+            </div>
+
+            {action.is_error ? (
+              <Badge variant="destructive" className="flex gap-2">
+                <span>Error Converting File</span>
+                <BiError />
+              </Badge>
+            ) : action.is_converted ? (
+              <Badge variant="default" className="flex gap-2 bg-green-500">
+                <span>Done</span>
+                <MdDone />
+              </Badge>
+            ) : action.is_converting ? (
+              <Badge variant="default" className="flex gap-2">
+                <span>Converting</span>
+                <span className="animate-spin">
+                  <ImSpinner3 />
+                </span>
+              </Badge>
+            ) : (
+              <div className="text-muted-foreground text-md flex items-center gap-4">
+                <span>Convert to</span>
+                <Select
+                  onValueChange={(value) => {
+                    if (extensions.audio.includes(value)) {
+                      setDefaultValues('audio');
+                    } else if (extensions.video.includes(value)) {
+                      setDefaultValues('video');
+                    }
+                    setSelected(value);
+                    updateAction(action.file_name, value);
+                  }}
+                  value={selcted}
+                >
+                  <SelectTrigger className="w-32 outline-none focus:outline-none focus:ring-0 text-center text-muted-foreground bg-background text-md font-medium">
+                    <SelectValue placeholder="..." />
+                  </SelectTrigger>
+                  <SelectContent className="h-fit">
+                    {action.file_type.includes('image') && (
+                      <div className="grid grid-cols-2 gap-2 w-fit">
+                        {extensions.image.map((elt, i) => (
+                          <div key={i} className="col-span-1 text-center">
+                            <SelectItem value={elt} className="mx-auto">
+                              {elt}
+                            </SelectItem>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {action.file_type.includes('video') && (
+                      <Tabs defaultValue={defaultValues} className="w-full">
+                        <TabsList className="w-full">
+                          <TabsTrigger value="video" className="w-full">
+                            Video
+                          </TabsTrigger>
+                          <TabsTrigger value="audio" className="w-full">
+                            Audio
+                          </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="video">
+                          <div className="grid grid-cols-3 gap-2 w-fit">
+                            {extensions.video.map((elt, i) => (
+                              <div key={i} className="col-span-1 text-center">
+                                <SelectItem value={elt} className="mx-auto">
+                                  {elt}
+                                </SelectItem>
+                              </div>
+                            ))}
+                          </div>
+                        </TabsContent>
+                        <TabsContent value="audio">
+                          <div className="grid grid-cols-3 gap-2 w-fit">
+                            {extensions.audio.map((elt, i) => (
+                              <div key={i} className="col-span-1 text-center">
+                                <SelectItem value={elt} className="mx-auto">
+                                  {elt}
+                                </SelectItem>
+                              </div>
+                            ))}
+                          </div>
+                        </TabsContent>
+                      </Tabs>
+                    )}
+                    {action.file_type.includes('audio') && (
+                      <div className="grid grid-cols-2 gap-2 w-fit">
+                        {extensions.audio.map((elt, i) => (
+                          <div key={i} className="col-span-1 text-center">
+                            <SelectItem value={elt} className="mx-auto">
+                              {elt}
+                            </SelectItem>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {action.is_converted ? (
+              <Button variant="outline" onClick={() => download(action)}>
+                Download
+              </Button>
+            ) : (
+              <span
+                onClick={() => deleteAction(action)}
+                className="cursor-pointer hover:bg-muted rounded-full h-10 w-10 flex items-center justify-center text-2xl text-foreground"
+              >
+                <MdClose />
+              </span>
+            )}
+          </div>
+        ))}
+        <div className="flex w-full justify-end">
+          {is_done ? (
+            <div className="space-y-4 w-fit">
+              <Button
+                size="lg"
+                className="rounded-xl font-semibold relative py-4 text-md flex gap-2 items-center w-full"
+                onClick={downloadAll}
+              >
+                {actions.length > 1 ? 'Download All' : 'Download'}
+                <HiOutlineDownload />
+              </Button>
+              <Button
+                size="lg"
+                onClick={reset}
+                variant="outline"
+                className="rounded-xl"
+              >
+                Convert Another File(s)
+              </Button>
+            </div>
+          ) : (
+            <Button
+              size="lg"
+              disabled={!is_ready || is_converting}
+              className="rounded-xl font-semibold relative py-4 text-md flex items-center w-44"
+              onClick={convert}
+            >
+              {is_converting ? (
+                <span className="animate-spin text-lg">
+                  <ImSpinner3 />
+                </span>
+              ) : (
+                <span>Convert Now</span>
+              )}
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ReactDropzone
