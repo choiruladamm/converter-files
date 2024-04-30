@@ -16,6 +16,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { extensions } from '@/utils/extensions';
+import fileToIcon from '@/utils/fileToIcon';
+import compressFileName from '@/utils/compressFileName';
+import bytesToSize from '@/utils/bytesToSize';
 
 interface DropzoneProps {}
 
