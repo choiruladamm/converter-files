@@ -28,6 +28,7 @@ import { MdClose, MdDone } from 'react-icons/md';
 import { ImSpinner3 } from 'react-icons/im';
 import { HiOutlineDownload } from 'react-icons/hi';
 import { acceptedFiles } from '@/utils/acceptedFiles';
+import { toast } from 'sonner';
 
 interface DropzoneProps {}
 
@@ -367,10 +368,22 @@ const Dropzone: FC<DropzoneProps> = ({}) => {
 
   return (
     <ReactDropzone
+      accept={acceptedFiles}
       onDrop={handleUpload}
       onDragEnter={handleHover}
       onDragLeave={handleExitHover}
-      accept={acceptedFiles}
+      onDropRejected={() => {
+        handleExitHover();
+        toast.error('Error uploading your file(s)', {
+          description: 'Allowed Files: Audio, Video and Images.',
+        });
+      }}
+      onError={() => {
+        handleExitHover();
+        toast.error('Error uploading your file(s)', {
+          description: 'Allowed Files: Audio, Video and Images.',
+        });
+      }}
     >
       {({ getRootProps, getInputProps }) => (
         <div

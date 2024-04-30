@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Navbar, ThemeProvider } from '@/components/globals';
+import { Toaster as SonnerToast } from '@/components/ui/sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,6 +25,14 @@ export default function RootLayout({
           enableSystem
           themes={['light', 'dark']}
         >
+          <SonnerToast
+            richColors
+            position="bottom-right"
+            closeButton
+            toastOptions={{
+              className: inter.className,
+            }}
+          />
           <Navbar />
           <div className="pt-32 min-h-screen lg:pt-36 2xl:pt-44 container max-w-4xl lg:max-w-6xl 2xl:max-w-7xl">
             {children}
