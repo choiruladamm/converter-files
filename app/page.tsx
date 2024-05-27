@@ -12,10 +12,11 @@ const HomePage: FC<HomePageProps> = ({}) => {
           Free Unlimited File Converter
         </h1>
         <p className="text-muted-foreground text-md md:text-lg text-center md:px-24 xl:px-44 2xl:px-52">
-          Unleash your creativity with Modifio – the ultimate online tool for
-          unlimited and free multimedia conversion. Transform images, audio, and
-          videos effortlessly, without restrictions. Start converting now and
-          elevate your content like never before!
+          Set your imagination free with Edito – the ultimate online alchemist
+          for transforming multimedia, all at no cost. Seamlessly convert
+          images, audio, and videos to unlock the full potential of your
+          content. Start your journey with Edito, the premier free conversion
+          app, and watch your creations soar to new heights!
         </p>
       </div>
 
