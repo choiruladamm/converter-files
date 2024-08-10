@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Navbar, ThemeProvider } from '@/components/globals';
 import { Toaster as SonnerToast } from '@/components/ui/sonner';
+import { Analytics } from '@vercel/analytics/react';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -37,6 +38,7 @@ export default function RootLayout({
           <div className="pt-32 min-h-screen lg:pt-36 2xl:pt-44 container max-w-4xl lg:max-w-6xl 2xl:max-w-7xl">
             {children}
           </div>
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
